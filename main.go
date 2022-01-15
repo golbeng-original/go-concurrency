@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -84,6 +85,46 @@ func useWorkerPool() {
 
 }
 
+func useWorkerPoolContext() {
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	taskPool1 := workerpool.NewPoolContext(2, ctx)
+	taskPool1.Run()
+
+	// 외부에서 강제로 취소 될 수 있다..!!
+	go func() {
+		time.Sleep(10 * time.Second)
+		cancel()
+	}()
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+
+		for i := 0; i < 10; i++ {
+
+			if taskPool1.IsDone() {
+				break
+			}
+
+			taskPool1.AddTask(func(args ...interface{}) {
+				time.Sleep(time.Millisecond * 500)
+				fmt.Println("Run Task - ", args[0])
+			}, i)
+		}
+
+		taskPool1.Done()
+		taskPool1.Wait()
+		fmt.Println("All End!")
+	}()
+
+	wg.Wait()
+
+}
+
 func main() {
-	useWorkerPool()
+	//useWorkerPool()
+	useWorkerPoolContext()
 }

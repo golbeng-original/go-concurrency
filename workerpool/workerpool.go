@@ -2,11 +2,6 @@ package workerpool
 
 import "sync"
 
-type Job struct {
-	task func(args ...interface{})
-	arg  []interface{}
-}
-
 type TaskPool struct {
 	maxWorker  int
 	queuedTask chan Job

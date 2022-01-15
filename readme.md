@@ -7,3 +7,4 @@ go의 동시성 프로그래밍 패턴들을 직접 작성하고 연구
 작성 된 항목들
 -----------
 - workerPool 패턴
+- context를 사용한 workerPool 패턴
